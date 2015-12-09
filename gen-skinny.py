@@ -7,15 +7,14 @@ global skinny
 global message_dissector_functions
 
 # template
-__file_header__ = '''
+__file_header__ = '''#!/usr/bin/env python2
 \'\'\'
 @created: 2015-Dec-09
 @author: dkgroot
 \'\'\'
 '''
 
-__skinnyclassstr__ = '''
-class SKINNY(dpkt.Packet):
+__skinnyclassstr__ = '''class SKINNY(dpkt.Packet):
   __byte_order__ = '<'
   __hdr__ = (
     ('len', 'I', 0),
@@ -40,7 +39,6 @@ class SKINNY(dpkt.Packet):
 def gen_skinnyMessage(skinny):
   ''' generate skinnyMessage.py '''
   with open('skinnyMessage.py', 'w') as f:
-    f.writelines('#!/usr/bin/env python2\n')
     f.writelines('%s\n' %__file_header__)
     f.writelines('\n')
     f.writelines('import struct\n')
@@ -57,16 +55,22 @@ def gen_skinnyMessage(skinny):
     f.writelines('_pbx2dev = 0x1\n')
     f.writelines('_dev2pbx = 0x2\n')
     f.writelines('\n')
+    f.writelines("'''message expect'''\n")
+    f.writelines('_request = 0x1\n')
+    f.writelines('_result = 0x2\n')
+    f.writelines('\n')
     f.writelines("'''skinny messages'''\n")
     f.writelines('skinny_messages = {\n')
     for message in skinny.message:
       #message_dissector_functions += '%s' %message.dissect()
-      expect = None
-      if message.status=="request":
-        expect = message.status
-      dynamic = False
-      if message.dynamic=="yes":
+      if message.status != "no":
+        expect = '_' + message.status
+      else:
+        expect = None
+      if message.dynamic == "yes":
         dynamic = True
+      else:
+        dynamic = False
       f.writelines("  %s: {'name':'%s', 'class':%s, 'direction': _%s, 'dynamic': %s, 'type':_%s, 'expect': %s},\n" %(message.opcode, message.name, message.name.replace('Message',''), message.direction, dynamic, message.type, expect))
     f.writelines('}\n')
     f.writelines('\n')
@@ -77,7 +81,6 @@ def gen_enums(skinny):
   for enum in skinny.enum:
     name = enum.name[0].upper() + enum.name[1:]
     with open('enums/' + name + '.py', 'w') as f:
-      f.writelines('#!/usr/bin/env python2\n')
       f.writelines('%s\n' %__file_header__)
       f.writelines('import Enumeration\n\n')
       f.writelines('class %s(Enumeration):\n' %name)
@@ -87,7 +90,6 @@ def gen_enums(skinny):
       
   ''' generates enums/__init__.py '''
   with open('enums/__init__.py', 'w') as f:
-    f.writelines('#!/usr/bin/env python2\n')
     f.writelines('%s\n' %__file_header__)
     enums= ','.join(map((lambda enum: "'" + enum.name[0].upper() + enum.name[1:] + "'"), skinny.enum))
     f.writelines('__all__ = [%s]' %enums)
@@ -103,7 +105,6 @@ def gen_messages(skinny):
 
     # write message content
     with open('messages/' + classname + '.py', 'w') as f:
-      f.writelines('#!/usr/bin/env python2\n')
       f.writelines('%s\n' %__file_header__)
       f.writelines('import struct\n')
       f.writelines('\n')
@@ -115,7 +116,6 @@ def gen_messages(skinny):
   ''' generates messages/__init__.py '''
   with open('messages/__init__.py', 'w') as f:
     messages= ','.join(map((lambda msg: "'" + msg.name.replace('Message','') + "'"), skinny.message))
-    f.writelines('#!/usr/bin/env python2\n')
     f.writelines('%s\n' %__file_header__)
     f.writelines('__all__ = [%s]' %messages)
 
