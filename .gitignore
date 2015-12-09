@@ -1,4 +1,6 @@
 messages/
+enums/
+!enums/Enumeration.py
 log/
 *.bak
 .*~
