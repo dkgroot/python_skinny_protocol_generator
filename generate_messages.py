@@ -4,8 +4,9 @@
 @created: 2015-Dec-09
 @author: dkgroot
 '''
+from __init__ import FILE_HEADER_STR
 
-def gen_messages(skinny):
+def generate(skinny):
   ''' generate a messages/* file per Skinny Message '''
   message_dissector_functions = ''
   for message in skinny.message:
@@ -16,7 +17,7 @@ def gen_messages(skinny):
 
     # write message content
     with open('messages/' + classname + '.py', 'w') as f:
-      f.writelines('%s\n' %__file_header__)
+      f.writelines('%s\n' %FILE_HEADER_STR)
       f.writelines('import struct\n')
       f.writelines('\n')
       f.writelines('class %s:\n' %classname)
@@ -27,5 +28,5 @@ def gen_messages(skinny):
   ''' generates messages/__init__.py '''
   with open('messages/__init__.py', 'w') as f:
     messages= ','.join(map((lambda msg: "'" + msg.name.replace('Message','') + "'"), skinny.message))
-    f.writelines('%s\n' %__file_header__)
+    f.writelines('%s\n' %FILE_HEADER_STR)
     f.writelines('__all__ = [%s]' %messages)

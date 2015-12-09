@@ -4,13 +4,14 @@
 @created: 2015-Dec-09
 @author: dkgroot
 '''
+from __init__ import FILE_HEADER_STR
 
-def gen_enums(skinny):
+def generate(skinny):
   ''' generate a enums/* file per Skinny Enum '''
   for enum in skinny.enum:
     name = enum.name[0].upper() + enum.name[1:]
     with open('enums/' + name + '.py', 'w') as f:
-      f.writelines('%s\n' %__file_header__)
+      f.writelines('%s\n' %FILE_HEADER_STR)
       f.writelines('import Enumeration\n\n')
       f.writelines('class %s(Enumeration):\n' %name)
       for entries in enum.entries:
@@ -19,6 +20,6 @@ def gen_enums(skinny):
       
   ''' generates enums/__init__.py '''
   with open('enums/__init__.py', 'w') as f:
-    f.writelines('%s\n' %__file_header__)
+    f.writelines('%s\n' %FILE_HEADER_STR)
     enums= ','.join(map((lambda enum: "'" + enum.name[0].upper() + enum.name[1:] + "'"), skinny.enum))
     f.writelines('__all__ = [%s]' %enums)

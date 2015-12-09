@@ -9,6 +9,7 @@ import string
 import parse_xml2skinny_dissector as xml2skinny
 import generate_enums 
 import generate_messages 
+from __init__ import FILE_HEADER_STR
 
 __skinnyMessageStr__ = '''
   import struct
@@ -54,7 +55,7 @@ __skinnyClassStr__ = '''class SKINNY(dpkt.Packet):
 def gen_skinnyMessage(skinny):
   ''' generate skinnyMessage.py '''
   with open('skinnyMessage.py', 'w') as f:
-    f.writelines('%s\n' %__file_header__)
+    f.writelines('%s\n' %FILE_HEADER_STR)
     f.writelines('%s\n' %__skinnyMessageStr__)
     f.writelines("'''skinny messages'''\n")
     f.writelines('skinny_messages = {\n')
@@ -71,7 +72,7 @@ def gen_skinnyMessage(skinny):
       f.writelines("  %s: {'name':'%s', 'class':%s, 'direction': _%s, 'dynamic': %s, 'type':_%s, 'expect': %s},\n" %(message.opcode, message.name, message.name.replace('Message',''), message.direction, dynamic, message.type, expect))
     f.writelines('}\n')
     f.writelines('\n')
-    f.writelines('%s\n' %____skinnyClassStr__)
+    f.writelines('%s\n' %__skinnyClassStr__)
 
 if __name__=='__main__':
   if len(sys.argv) < 2:
@@ -82,6 +83,6 @@ if __name__=='__main__':
   skinny = xml2skinny.xml2obj(sys.argv[1])
   
   gen_skinnyMessage(skinny)
-  gen_enums(skinny)
-  gen_messages(skinny)
+  generate_enums.generate(skinny)
+  generate_messages.generate(skinny)
   
