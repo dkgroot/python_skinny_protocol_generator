@@ -47,10 +47,27 @@ def gen_skinnyMessage(skinny):
     f.writelines('import dpkt\n')
     f.writelines('from messages import *\n')
     f.writelines('\n')
+    f.writelines("'''message types'''\n")
+    f.writelines('_RegistrationAndManagement = 0x1\n')
+    f.writelines('_MediaControl = 0x2\n')
+    f.writelines('_CallControl = 0x3\n')
+    f.writelines('_IntraCCM = 0x4\n')
+    f.writelines('\n')
+    f.writelines("'''message direction'''\n")
+    f.writelines('_pbx2dev = 0x1\n')
+    f.writelines('_dev2pbx = 0x2\n')
+    f.writelines('\n')
+    f.writelines("'''skinny messages'''\n")
     f.writelines('skinny_messages = {\n')
     for message in skinny.message:
       #message_dissector_functions += '%s' %message.dissect()
-      f.writelines("  %s: {'name':'%s', 'class':%s, 'expect': None},\n" %(message.opcode, message.name, message.name.replace('Message','')))
+      expect = None
+      if message.status=="request":
+        expect = message.status
+      dynamic = False
+      if message.dynamic=="yes":
+        dynamic = True
+      f.writelines("  %s: {'name':'%s', 'class':%s, 'direction': _%s, 'dynamic': %s, 'type':_%s, 'expect': %s},\n" %(message.opcode, message.name, message.name.replace('Message',''), message.direction, dynamic, message.type, expect))
     f.writelines('}\n')
     f.writelines('\n')
     f.writelines('%s\n' %__skinnyclassstr__)
