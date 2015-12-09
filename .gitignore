@@ -1,6 +1,6 @@
-messages/
-enums/
-!enums/Enumeration.py
+skinny/messages/
+!skinny/enums/Enumeration.py
+skinny/enums/
 log/
 *.bak
 .*~

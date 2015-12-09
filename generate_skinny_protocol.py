@@ -54,7 +54,7 @@ __skinnyClassStr__ = '''class SKINNY(dpkt.Packet):
 
 def gen_skinnyMessage(skinny):
   ''' generate skinnyMessage.py '''
-  with open('skinnyMessage.py', 'w') as f:
+  with open('skinny/skinnyMessage.py', 'w') as f:
     f.writelines('%s\n' %FILE_HEADER_STR)
     f.writelines('%s\n' %__skinnyMessageStr__)
     f.writelines("'''skinny messages'''\n")

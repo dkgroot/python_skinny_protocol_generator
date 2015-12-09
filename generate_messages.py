@@ -16,7 +16,7 @@ def generate(skinny):
     # prepare message content
 
     # write message content
-    with open('messages/' + classname + '.py', 'w') as f:
+    with open('skinny/messages/' + classname + '.py', 'w') as f:
       f.writelines('%s\n' %FILE_HEADER_STR)
       f.writelines('import struct\n')
       f.writelines('\n')
@@ -26,7 +26,7 @@ def generate(skinny):
       f.writelines('  }\n')
 
   ''' generates messages/__init__.py '''
-  with open('messages/__init__.py', 'w') as f:
+  with open('skinny/messages/__init__.py', 'w') as f:
     messages= ','.join(map((lambda msg: "'" + msg.name.replace('Message','') + "'"), skinny.message))
     f.writelines('%s\n' %FILE_HEADER_STR)
     f.writelines('__all__ = [%s]' %messages)
