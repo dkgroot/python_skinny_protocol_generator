@@ -5,6 +5,7 @@
 @author: dkgroot
 '''
 from __init__ import FILE_HEADER_STR
+import os
 
 def generate(skinny):
   ''' generate a messages/* file per Skinny Message '''
@@ -15,6 +16,10 @@ def generate(skinny):
     
     # prepare message content
 
+    # create skinny/message directory if not exist
+    d = os.path.dirname('skinny/messages/')
+    if not os.path.exists(d):
+      os.makedirs(d)
     # write message content
     with open('skinny/messages/' + classname + '.py', 'w') as f:
       f.writelines('%s\n' %FILE_HEADER_STR)
