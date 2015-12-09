@@ -6,7 +6,7 @@
 '''
 import sys
 import string
-import parse_xml2skinny_dissector as xml2skinny
+import xml2skinnyobj as xml2skinny
 import generate_enums 
 import generate_messages 
 from __init__ import FILE_HEADER_STR
