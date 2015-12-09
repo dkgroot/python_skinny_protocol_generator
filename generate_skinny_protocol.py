@@ -12,23 +12,23 @@ import generate_messages
 from __init__ import FILE_HEADER_STR
 
 __skinnyMessageStr__ = '''
-  import struct
-  import dpkt
-  from messages import *
+import struct
+import dpkt
+from messages import *
 
-  \'\'\'message types\'\'\'
-  _RegistrationAndManagement = 0x1
-  _MediaControl = 0x2
-  _CallControl = 0x3
-  _IntraCCM = 0x4
+\'\'\'message types\'\'\'
+_RegistrationAndManagement = 0x1
+_MediaControl = 0x2
+_CallControl = 0x3
+_IntraCCM = 0x4
 
-  \'\'\'message direction\'\'\'
-  _pbx2dev = 0x1
-  _dev2pbx = 0x2
+\'\'\'message direction\'\'\'
+_pbx2dev = 0x1
+_dev2pbx = 0x2
 
-  \'\'\'message expect\'\'\'
-  _request = 0x1
-  _result = 0x2
+\'\'\'message expect\'\'\'
+_request = 0x1
+_result = 0x2
 '''
 __skinnyClassStr__ = '''class SKINNY(dpkt.Packet):
   __byte_order__ = '<'
