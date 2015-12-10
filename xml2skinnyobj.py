@@ -897,14 +897,15 @@ def xml2obj(src):
 #       for message in skinny.message:
 #         print '%s' %message.dissect()
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
 #  import timeit
 #  print(timeit.timeit("generateMessageDissectors()", setup="from __main__ import generateMessageDissectors"))
 
 
-#skinny = xml2obj('SkinnyProtocolOptimized.xml')
-#for message in skinny.message:
-#    message.dissect()
+  skinny = xml2obj('SkinnyProtocolOptimized.xml')
+  for message in skinny.message:
+    content = message.dissect()
+    print content
 
 #for key,value in fieldsArray.items():
 #       print "%s : %s" %(key,value)
