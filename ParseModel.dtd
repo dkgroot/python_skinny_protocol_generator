@@ -1,0 +1,89 @@
+<!ELEMENT define EMPTY>
+<!ATTLIST define
+  name 		ID #REQUIRED
+  value		CDATA #REQUIRED
+  descr		CDATA #IMPLIED
+>
+<!ELEMENT struct (fields)*>
+<!ATTLIST struct
+  name 		ID #REQUIRED
+  descr		CDATA #IMPLIED
+>
+<!ELEMENT union (fields)*>
+<!ATTLIST union
+  name 		ID #REQUIRED
+  descr		CDATA #IMPLIED
+  lookup_eq	CDATA #IMPLIED
+  lookup_ge	CDATA #IMPLIED
+  lookup_le	CDATA #IMPLIED
+>
+<!ELEMENT typedef EMPTY>
+<!ATTLIST typedef
+  name 		ID #REQUIRED
+  type		NMTOKEN #REQUIRED
+  subtype	IDREF #IMPLIED
+  descr		CDATA #IMPLIED
+  comment 	CDATA #IMPLIED
+  orig		CDATA #IMPLIED
+>
+<!ELEMENT messages (message?, typedef?, struct?, enum?, union?)*>
+<!ELEMENT message (fields)*>
+<!ATTLIST message
+  name 		ID #REQUIRED
+  opcode	NMTOKEN #REQUIRED
+  direction 	(dev2pbx | pbx2dev | pbx2pbx) "dev2pbx"
+  type		(RegistrationAndManagement | Conference | CallControl | MediaControl | IntraCCM) "RegistrationAndManagement"
+  status	(no | status | request | result) "no"
+  alignment	CDATA #IMPLIED
+  descr		CDATA #IMPLIED
+  comment 	CDATA #IMPLIED
+  orig		CDATA #IMPLIED
+  priority	(send_immediate) #IMPLIED
+>
+<!ELEMENT fields (field?)*>
+<!ATTLIST fields
+  beginversion  CDATA #IMPLIED
+  endversion    CDATA #IMPLIED
+  alignment	CDATA #IMPLIED
+>
+<!ELEMENT field EMPTY>
+<!ATTLIST field
+  name 		NMTOKEN #REQUIRED
+  type 		(char | int4 | int8 | int16 | int32 | uint4 | uint8 | uint16 | uint32 | struct | union | enum | typedef | ptr | array | ipaddr | ipport| ipv4 | ipv6 | xml) "uint32"
+  endianness 	(little | big) "little"
+  subtype 	CDATA #IMPLIED
+  size 		CDATA #IMPLIED
+  alignment	CDATA #IMPLIED
+  use_param	NMTOKENS #IMPLIED
+  size_fieldname NMTOKENS #IMPLIED
+  lookup_guide  NMTOKENS #IMPLIED
+  descr		CDATA #IMPLIED
+  comment 	CDATA #REQUIRED
+  orig		CDATA #REQUIRED
+  maxsize	CDATA #IMPLIED
+>
+<!ELEMENT enum (entries)*>
+<!ATTLIST enum
+  name 		ID #REQUIRED
+  alignment	CDATA #IMPLIED
+  descr		CDATA #IMPLIED
+  comment 	CDATA #IMPLIED
+  orig		CDATA #IMPLIED
+>
+<!ELEMENT entries (entry*)*>
+<!ELEMENT entry EMPTY>
+<!ATTLIST entry
+  name 		ID #REQUIRED
+  value		NMTOKEN #REQUIRED
+  text		CDATA #IMPLIED
+  alignment	CDATA #IMPLIED
+  boundscheck	CDATA #IMPLIED
+  descr		CDATA #IMPLIED
+  comment 	CDATA #IMPLIED
+  orig		CDATA #IMPLIED
+>
+<!ENTITY  amp "&#38;#38;" >
+<!ENTITY   lt "&#38;#60;" >
+<!ENTITY   gt "&#62;" >
+<!ENTITY quot "&#34;" >
+
