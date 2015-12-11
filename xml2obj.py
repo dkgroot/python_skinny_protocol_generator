@@ -125,7 +125,7 @@ def xml2obj(src):
     class Fields(DataNode):
         ''' Fields '''
         def __init__(self):
-	    DataNode.__init__(self)
+            super(self.__class__, self).__init__()
 	    self.field = []
         
         def _addchild(self, name, value):
@@ -135,54 +135,62 @@ def xml2obj(src):
 
     class FieldType(DataNode):
         def __init__(self):
+            #super(self.__class__, self).__init__()
 	    DataNode.__init__(self)
 	    self.endian = "ENC_LITTLE_ENDIAN"
 	    self.sparce = 0
 	    #self.parent.intsize += self.intsize
 
     class Integer(FieldType):
+        ''' Integer '''
         def __init__(self):
-	    FieldType.__init__(self)
+            super(self.__class__, self).__init__()
 	    self.intsize = 4
 	    self.endian = "ENC_LITTLE_ENDIAN"
 
     class Enum(FieldType):
+        ''' Enum '''
         def __init__(self):
-	    FieldType.__init__(self)
+            super(self.__class__, self).__init__()
 	    self.intsize = 4
 	    self.sparse = 0
 	    self.endian = "ENC_LITTLE_ENDIAN"
         
     class Ether(FieldType):
+        ''' Ether / Mac-Address '''
         def __init__(self):
-	    FieldType.__init__(self)
+            super(self.__class__, self).__init__()
 	    self.intsize = 4
 
     class BitField(FieldType):
+        ''' BitField '''
         def __init__(self):
-	    FieldType.__init__(self)
+            super(self.__class__, self).__init__()
 	    self.intsize = 4
 
     class Ip(FieldType):
+        ''' IP '''
         def __init__(self):
 	    FieldType.__init__(self)
 	    self.intsize = 4
 
     class Ipv4or6(Ip):
+        ''' IPv4 or IPv6 '''
         def __init__(self):
-	    Ip.__init__(self)
+            super(self.__class__, self).__init__()
             if self.endianness is None:
               self.intsize += 16
               #self.parent.intsize += self.intsize
-              
 
     class String(FieldType):
+        ''' String '''
         def __init__(self):
-	    FieldType.__init__(self)
+            super(self.__class__, self).__init__()
 
     class XML(FieldType):
+        ''' XML '''
         def __init__(self):
-	    FieldType.__init__(self)
+            super(self.__class__, self).__init__()
 
     class StructUnionMessage(DataNode):
         ''' StructUnionMessage '''
@@ -194,9 +202,6 @@ def xml2obj(src):
                 # skip whole message and return NULL as handler
                 return 'NULL'
             return 'handle_%s' %self.name
-
-        #def __repr__(self):
-        #    return self.name or ''
     
     class Message(StructUnionMessage):
         ''' Message '''
@@ -204,14 +209,19 @@ def xml2obj(src):
             return "Message:%s / %s" %(self.name, self.intsize)
 
     class Struct(StructUnionMessage):
-        pass
+        ''' Struct '''
         def __str__(self):
             return "Struct:%s / %s / %s / %s\n" %(self.name, self.intsize, self.field_sizename, self.maxsize)
 
     class Union(StructUnionMessage):
-        pass
+        ''' Union '''
         def __str__(self):
             return "Union:%s:%s" %(self.__class__,self.name)
+
+    class Definition(FieldType):
+        ''' Definition '''
+        def __str__(self):
+            return "Define:%s:%s" %(self.__class__,self.name)
 
     class TreeBuilder(xml.sax.handler.ContentHandler):
         def __init__(self):
@@ -222,7 +232,21 @@ def xml2obj(src):
             self.basemessage = None
             self.text_parts = []
         def startElement(self, name, attrs):
-            objecttype = {"message": Message(), "fields": Fields(), "enum" : Enum(), "bitfield" : BitField(), "struct": Struct(), "union": Union(), "integer": Integer(), "string": String(), "ether": Ether(), "ip": Ip(), "ipv4or6": Ipv4or6(), "xml": XML()}
+            objecttype = {
+            	"message": Message(), 
+            	"fields": Fields(), 
+            	"enum" : Enum(), 
+            	"bitfield" : BitField(), 
+            	"struct": Struct(), 
+            	"union": Union(), 
+            	"integer": Integer(), 
+            	"string": String(), 
+            	"ether": Ether(), 
+            	"ip": Ip(), 
+            	"ipv4or6": Ipv4or6(), 
+            	"xml": XML(),
+            	"define": Definition()
+	    }
             self.previous = self.current
             self.stack.append((self.current, self.text_parts))
             if name in objecttype.keys():
