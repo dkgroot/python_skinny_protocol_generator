@@ -1,27 +1,7 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
-  <xs:element name="entry">
-    <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base="xs:string">
-          <xs:attribute type="xs:string" name="comment" use="optional"/>
-          <xs:attribute type="xs:string" name="name" use="optional"/>
-          <xs:attribute type="xs:string" name="text" use="optional"/>
-          <xs:attribute type="xs:string" name="value" use="optional"/>
-          <xs:attribute type="xs:string" name="boundscheck" use="optional"/>
-        </xs:extension>
-      </xs:simpleContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="entries">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="entry" maxOccurs="unbounded" minOccurs="0"/>
-      </xs:sequence>
-      <xs:attribute type="xs:string" name="type" use="optional"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="string">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- field types -->
+  <xs:element name="stringType">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
@@ -38,7 +18,7 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="integer">
+  <xs:element name="integerType">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
@@ -57,28 +37,7 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="fields">
-    <xs:complexType>
-      <xs:choice maxOccurs="unbounded" minOccurs="0">
-        <xs:element ref="string"/>
-        <xs:element ref="struct"/>
-        <xs:element ref="ip"/>
-        <xs:element ref="enum"/>
-        <xs:element ref="integer"/>
-        <xs:element ref="bitfield"/>
-        <xs:element ref="ether"/>
-        <xs:element ref="union"/>
-        <xs:element ref="ipv4or6"/>
-        <xs:element ref="xml"/>
-      </xs:choice>
-      <xs:attribute type="xs:short" name="size_gt" use="optional"/>
-      <xs:attribute type="xs:byte" name="beginversion" use="optional"/>
-      <xs:attribute type="xs:byte" name="endversion" use="optional"/>
-      <xs:attribute type="xs:byte" name="alignment" use="optional"/>
-      <xs:attribute type="xs:short" name="size_lt" use="optional"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="struct">
+  <xs:element name="structType">
     <xs:complexType mixed="true">
       <xs:sequence>
         <xs:element ref="fields" maxOccurs="unbounded" minOccurs="0"/>
@@ -97,7 +56,7 @@
       <xs:attribute type="xs:string" name="declare" use="optional"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ip">
+  <xs:element name="ipType">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
@@ -109,38 +68,7 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="enum">
-    <xs:complexType mixed="true">
-      <xs:sequence>
-        <xs:element ref="entries" maxOccurs="unbounded" minOccurs="0"/>
-      </xs:sequence>
-      <xs:attribute type="xs:string" name="comment" use="optional"/>
-      <xs:attribute type="xs:string" name="longcomment" use="optional"/>
-      <xs:attribute type="xs:string" name="name" use="optional"/>
-      <xs:attribute type="xs:string" name="subtype" use="optional"/>
-      <xs:attribute type="xs:string" name="type" use="optional"/>
-      <xs:attribute type="xs:string" name="lookup_eq" use="optional"/>
-      <xs:attribute type="xs:string" name="declare" use="optional"/>
-      <xs:attribute type="xs:byte" name="maxsize" use="optional"/>
-      <xs:attribute type="xs:string" name="size_fieldname" use="optional"/>
-      <xs:attribute type="xs:byte" name="size" use="optional"/>
-      <xs:attribute type="xs:string" name="define" use="optional"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="bitfield">
-    <xs:complexType mixed="true">
-      <xs:sequence>
-        <xs:element ref="entries" maxOccurs="unbounded" minOccurs="0"/>
-      </xs:sequence>
-      <xs:attribute type="xs:string" name="comment" use="optional"/>
-      <xs:attribute type="xs:string" name="name" use="optional"/>
-      <xs:attribute type="xs:string" name="size" use="optional"/>
-      <xs:attribute type="xs:string" name="subtype" use="optional"/>
-      <xs:attribute type="xs:string" name="type" use="optional"/>
-      <xs:attribute type="xs:string" name="longcomment" use="optional"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ether">
+  <xs:element name="etherType">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
@@ -153,7 +81,7 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="union">
+  <xs:element name="unionType">
     <xs:complexType mixed="true">
       <xs:sequence>
         <xs:element ref="fields" minOccurs="0"/>
@@ -165,7 +93,7 @@
       <xs:attribute type="xs:string" name="type" use="optional"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ipv4or6">
+  <xs:element name="ipv4or6Type">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
@@ -181,7 +109,7 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="xml">
+  <xs:element name="xmlType">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
@@ -195,6 +123,50 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
+
+  <xs:element name="entry">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute type="xs:string" name="comment" use="optional"/>
+          <xs:attribute type="xs:string" name="name" use="optional"/>
+          <xs:attribute type="xs:string" name="text" use="optional"/>
+          <xs:attribute type="xs:string" name="value" use="optional"/>
+          <xs:attribute type="xs:string" name="boundscheck" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:group name="entries">
+    <xs:sequence>
+      <xs:element ref="entry" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="type" use="optional"/>
+  </xs:group>
+  
+  <xs:element name="fields">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element name="string" type="stringType"/>
+        <xs:element name="struct" type="structType"/>
+        <xs:element name="ip" type="ipType"/>
+        <xs:element name="enum" type="enumType"/>
+        <xs:element name="integer" type="integerType"/>
+        <xs:element name="bitfield" type="bitfieldType"/>
+        <xs:element name="ether" type="etherType"/>
+        <xs:element name="union" type="unionType"/>
+        <xs:element name="ipv4or6" type="ipv4or6Type"/>
+        <xs:element name="xml" type="xmlType"/>
+      </xs:choice>
+      <xs:attribute type="xs:short" name="size_gt" use="optional"/>
+      <xs:attribute type="xs:byte" name="beginversion" use="optional"/>
+      <xs:attribute type="xs:byte" name="endversion" use="optional"/>
+      <xs:attribute type="xs:byte" name="alignment" use="optional"/>
+      <xs:attribute type="xs:short" name="size_lt" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="message">
     <xs:complexType mixed="true">
       <xs:sequence>
@@ -210,6 +182,40 @@
       <xs:attribute type="xs:string" name="priority" use="optional"/>
     </xs:complexType>
   </xs:element>
+
+  <xs:element name="enum">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:group ref="entries" maxOccurs="unbounded" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute type="xs:string" name="comment" use="optional"/>
+      <xs:attribute type="xs:string" name="longcomment" use="optional"/>
+      <xs:attribute type="xs:string" name="name" use="optional"/>
+      <xs:attribute type="xs:string" name="subtype" use="optional"/>
+      <xs:attribute type="xs:string" name="type" use="optional"/>
+      <xs:attribute type="xs:string" name="lookup_eq" use="optional"/>
+      <xs:attribute type="xs:string" name="declare" use="optional"/>
+      <xs:attribute type="xs:byte" name="maxsize" use="optional"/>
+      <xs:attribute type="xs:string" name="size_fieldname" use="optional"/>
+      <xs:attribute type="xs:byte" name="size" use="optional"/>
+      <xs:attribute type="xs:string" name="define" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="bitfield">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:group ref="entries" maxOccurs="unbounded" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute type="xs:string" name="comment" use="optional"/>
+      <xs:attribute type="xs:string" name="name" use="optional"/>
+      <xs:attribute type="xs:string" name="size" use="optional"/>
+      <xs:attribute type="xs:string" name="subtype" use="optional"/>
+      <xs:attribute type="xs:string" name="type" use="optional"/>
+      <xs:attribute type="xs:string" name="longcomment" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="messages">
     <xs:complexType>
       <xs:choice maxOccurs="unbounded" minOccurs="0">
