@@ -27,6 +27,14 @@ fieldsArray = {}
 si_fields = {"callReference" : "si->callId", "lineInstance": "si->lineId", "passThruPartyId" : "si->passThruId", "callState" : "si->callState", "callingParty" : "si->callingParty", "calledParty" : "si->calledParty", "openReceiveChannelStatus" : "si->openreceiveStatus", "startMediaTransmissionStatus" : "si->startmediatransmisionStatus"}
 debug = 1
 
+# signedness
+UNSIGNED = 1
+SIGNED = 2
+
+# endianness
+LITTLE_ENDIAN = 1
+BIG_ENDIAN = 2
+
 def xml2obj(src):
     """
     A function to converts XML data into native Python objects.
@@ -47,6 +55,7 @@ def xml2obj(src):
             self.intsize = 0
             #self.declared = []
             self.len = 0
+            self.endian = LITTLE_ENDIAN
 
         def __len__(self):
             return self.len
@@ -97,9 +106,6 @@ def xml2obj(src):
                 items.append(('data', self.data))
             return u'{%s}' % ', '.join([u'%s:%s' % (k,repr(v)) for k,v in items])
             
-        def incrementintsize(self, size):
-            self.intsize += size
-
         def keys(self):
             return self._attrs.keys()
 
@@ -122,6 +128,30 @@ def xml2obj(src):
         def indent_out(self, string):
             return indent_str + string
 
+    class Entries(DataNode):
+        ''' Enum Entries '''
+        def __init__(self):
+            super(self.__class__, self).__init__()
+	    self.entries = []
+        
+        def _addchild(self, name, value):
+            self.len += 1 
+            self._children.append(value)
+            self.entries.append(value)
+            
+        def __repr__(self):
+            if self.entries is None:
+              return None
+            return "entries: %s" %repr(self.entries)
+
+    class Entry(DataNode):
+        ''' Enum Entry '''
+        def __init__(self):
+	    DataNode.__init__(self)
+
+        def __repr__(self):
+            return repr(self._attrs)
+
     class Fields(DataNode):
         ''' Fields '''
         def __init__(self):
@@ -129,30 +159,40 @@ def xml2obj(src):
 	    self.field = []
         
         def _addchild(self, name, value):
-            self.len +=1 
+            self.len += 1 
             self._children.append(value)
             self.field.append(value)
+            
+        def __repr__(self):
+            retval=""
+            if self._children is None:
+              return None
+            return "fields: %s" %repr(self._children)
 
     class FieldType(DataNode):
         def __init__(self):
-            #super(self.__class__, self).__init__()
 	    DataNode.__init__(self)
-	    self.endian = "ENC_LITTLE_ENDIAN"
 	    self.sparce = 0
-	    #self.parent.intsize += self.intsize
+
+        def __repr__(self):
+            if self.__class__ == Message:
+              raise AttributeExpeption
+            else:
+	      return repr(self._attrs)
 
     class Integer(FieldType):
         ''' Integer '''
-        def __init__(self):
+        def __init__(self, size = 4, signedness = SIGNED):
             super(self.__class__, self).__init__()
-	    self.intsize = 4
-	    self.endian = "ENC_LITTLE_ENDIAN"
+	    self.intsize = size
+	    self.signedness = signedness
+	    self.endian = LITTLE_ENDIAN
 
     class Enum(FieldType):
         ''' Enum '''
-        def __init__(self):
+        def __init__(self, size):
             super(self.__class__, self).__init__()
-	    self.intsize = 4
+	    self.intsize = size
 	    self.sparse = 0
 	    self.endian = "ENC_LITTLE_ENDIAN"
         
@@ -173,14 +213,14 @@ def xml2obj(src):
         def __init__(self):
 	    FieldType.__init__(self)
 	    self.intsize = 4
+	    self.endian = BIG_ENDIAN
 
     class Ipv4or6(Ip):
         ''' IPv4 or IPv6 '''
         def __init__(self):
             super(self.__class__, self).__init__()
-            if self.endianness is None:
-              self.intsize += 16
-              #self.parent.intsize += self.intsize
+            #self.intsize += 16
+	    self.endian = BIG_ENDIAN
 
     class String(FieldType):
         ''' String '''
@@ -189,6 +229,11 @@ def xml2obj(src):
 
     class XML(FieldType):
         ''' XML '''
+        def __init__(self):
+            super(self.__class__, self).__init__()
+
+    class TypeDef(FieldType):
+        ''' TypeDef '''
         def __init__(self):
             super(self.__class__, self).__init__()
 
@@ -202,6 +247,12 @@ def xml2obj(src):
                 # skip whole message and return NULL as handler
                 return 'NULL'
             return 'handle_%s' %self.name
+        
+        def __repr__(self):
+            if self.fields is None:
+                raise AttributeException
+            for fields in self.fields:
+                return "%s" %repr(self.fields)
     
     class Message(StructUnionMessage):
         ''' Message '''
@@ -234,23 +285,44 @@ def xml2obj(src):
         def startElement(self, name, attrs):
             objecttype = {
             	"message": Message(), 
+            	"define": Definition(),
             	"fields": Fields(), 
-            	"enum" : Enum(), 
+            	"field": FieldType(), 
+            	"entries": Entries(), 
+            	"entry": Entry(),
+	    }
+	    fieldtype = {
+            	"char": String(),
+            	"enum" : Enum(8),
+            	"enum8" : Enum(8),
+            	"enum16": Enum(16),
             	"bitfield" : BitField(), 
+            	"uint8": Integer(8,UNSIGNED),
+            	"uint16": Integer(16,UNSIGNED),
+            	"uint32": Integer(32,UNSIGNED),
+            	"int8": Integer(8,SIGNED),
+            	"int16": Integer(16,SIGNED),
+            	"int32": Integer(32,SIGNED),
+            	"typedef": TypeDef(),
+            	"ipv4": Ip(),
+            	"ipv6": Ip(),
+            	"ipaddr": Ipv4or6(),
+            	"ipport": Integer(32,UNSIGNED),
+            	"xml": XML(),
             	"struct": Struct(), 
             	"union": Union(), 
-            	"integer": Integer(), 
-            	"string": String(), 
-            	"ether": Ether(), 
-            	"ip": Ip(), 
-            	"ipv4or6": Ipv4or6(), 
-            	"xml": XML(),
-            	"define": Definition()
-	    }
+            }
             self.previous = self.current
             self.stack.append((self.current, self.text_parts))
             if name in objecttype.keys():
-                self.current = objecttype[name]
+                if name == "field":
+                  #print "%s:%s" %(name, attrs['type'])
+                  if attrs['type'] in fieldtype:
+                    self.current = fieldtype[attrs['type']]
+                  else:
+                    self.current = objecttype[name]
+                else:
+                  self.current = objecttype[name]
             else:
                 self.current = DataNode()
             if name == "message":
@@ -291,16 +363,19 @@ def xml2obj(src):
 if __name__ == '__main__':
   skinny = xml2obj('SkinnyProtocol.xml')
   for message in skinny.message:
-    #print message
-    print message
-    print message.keys()
+    try:
+      print repr(message)
+    except Exception as e:
+      print "Exception"
+      
+    #print message.keys()
     #print len(message)
-    if message.fields is not None:
-      for fields in message.fields:
-        if fields.size_gt:
-          print " - field_gt" + fields.size_gt
-        for field in fields.field:
-          print "   - %s:%d" %(field.name, field.intsize)
+    #if message.fields is not None:
+    #  for fields in message.fields:
+    #    if fields.size_gt:
+    #      print " - field_gt" + fields.size_gt
+    #    for field in fields.field:
+    #      print "   - %s:%d" %(field.name, field.intsize)
           
   for union in skinny.union:
     print repr(union)
